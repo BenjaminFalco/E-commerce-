@@ -20,11 +20,16 @@ export interface Product {
   estado_producto: string;
   fecha_ultima_compra: string;
   ultima_actualizacion: string;
+  img_principal_url: string;
+  img_zoom_url: string;
+  img_icono_url: string;
+  img_thumbnail_url: string;
+  img_galeria_1_url: string;
 }
 
-const SHEET_ID = "1TQXwskKWUQ3NQnXcVx4pE1Zpxtu8tns9";
-const GID = "1620448077";
-const SHEETS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
+const SHEET_ID = "1Znbuniwm_hzwtgMxjRNK5-Rk6k-BJfL2qdKLYacChsE";
+const GID = "0";
+const SHEETS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
 
 function parseCSVLine(line: string): string[] {
   const result: string[] = [];
@@ -107,6 +112,11 @@ export async function fetchProducts(): Promise<Product[]> {
       estado_producto: row.estado_producto || "No disponible",
       fecha_ultima_compra: row.fecha_ultima_compra || "No disponible",
       ultima_actualizacion: row.ultima_actualizacion || "No disponible",
+      img_principal_url: row.img_principal_url || "",
+      img_zoom_url: row.img_zoom_url || "",
+      img_icono_url: row.img_icono_url || "",
+      img_thumbnail_url: row.img_thumbnail_url || "",
+      img_galeria_1_url: row.img_galeria_1_url || "",
     }));
   } catch (error) {
     console.error("Error fetching products:", error);

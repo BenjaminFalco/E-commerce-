@@ -11,6 +11,12 @@ interface ProductCardProps {
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const stockStatus = getStockStatus(product.stock_actual, product.stock_minimo);
   const stockLabel = getStockLabel(stockStatus);
+  const placeholderImage = "/placeholder.svg";
+  const thumbnailImage =
+    product.img_thumbnail_url?.trim() ||
+    product.img_principal_url?.trim() ||
+    placeholderImage;
+  const iconImage = product.img_icono_url?.trim();
 
   return (
     <Link
@@ -18,10 +24,18 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       className="product-card group block"
       style={{ animationDelay: `${index * 50}ms` }}
     >
-      {/* Product Image Placeholder */}
+      {/* Product Image */}
       <div className="relative aspect-square bg-secondary flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5" />
-        <Package className="h-16 w-16 text-muted-foreground/30 transition-transform group-hover:scale-110" />
+        <img
+          src={thumbnailImage}
+          alt={product.nombre}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={(event) => {
+            event.currentTarget.src = placeholderImage;
+          }}
+        />
+        <Package className="h-16 w-16 text-muted-foreground/30 transition-transform group-hover:scale-110 relative z-10" />
         
         {/* Category Badge */}
         <Badge 
@@ -49,8 +63,18 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         </div>
 
         {/* Name */}
-        <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-accent transition-colors">
-          {product.nombre}
+        <h3 className="flex items-center gap-2 font-semibold text-sm leading-tight line-clamp-2 group-hover:text-accent transition-colors">
+          {iconImage && (
+            <img
+              src={iconImage}
+              alt={`Icono de ${product.nombre}`}
+              className="h-4 w-4 shrink-0"
+              onError={(event) => {
+                event.currentTarget.style.display = "none";
+              }}
+            />
+          )}
+          <span>{product.nombre}</span>
         </h3>
 
         {/* Compatible Model */}

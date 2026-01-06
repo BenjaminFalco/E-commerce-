@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useProduct } from "@/hooks/useProducts";
 import { Header } from "@/components/Header";
@@ -26,6 +27,8 @@ import { toast } from "sonner";
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { product, isLoading, error } = useProduct(Number(id));
+  const placeholderImage = "/placeholder.svg";
+  const [mainImage, setMainImage] = useState<string>(placeholderImage);
 
   const handleDemoAction = (action: string) => {
     toast.info(`Demo: ${action}`, {
@@ -79,6 +82,28 @@ export default function ProductDetail() {
 
   const stockStatus = getStockStatus(product.stock_actual, product.stock_minimo);
   const stockLabel = getStockLabel(stockStatus);
+  const zoomImage =
+    product.img_zoom_url?.trim() ||
+    product.img_principal_url?.trim() ||
+    mainImage;
+
+  const galleryImages = useMemo(() => {
+    const sources = [
+      product.img_thumbnail_url?.trim(),
+      product.img_galeria_1_url?.trim(),
+      product.img_principal_url?.trim(),
+    ].filter(Boolean) as string[];
+    return Array.from(new Set(sources));
+  }, [product.img_thumbnail_url, product.img_galeria_1_url, product.img_principal_url]);
+
+  useEffect(() => {
+    const initialImage =
+      product.img_principal_url?.trim() ||
+      product.img_thumbnail_url?.trim() ||
+      product.img_galeria_1_url?.trim() ||
+      placeholderImage;
+    setMainImage(initialImage);
+  }, [product, placeholderImage]);
 
   const StockIcon = stockStatus === 'available' ? CheckCircle : 
                     stockStatus === 'low' ? AlertTriangle : XCircle;
@@ -102,7 +127,23 @@ export default function ProductDetail() {
           <div className="animate-fade-in">
             <div className="relative aspect-square bg-secondary rounded-xl flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5" />
-              <Package className="h-32 w-32 text-muted-foreground/20" />
+              <a
+                href={zoomImage}
+                target="_blank"
+                rel="noreferrer"
+                className="absolute inset-0"
+                aria-label="Abrir imagen en zoom"
+              >
+                <img
+                  src={mainImage}
+                  alt={product.nombre}
+                  className="h-full w-full object-cover"
+                  onError={(event) => {
+                    event.currentTarget.src = placeholderImage;
+                  }}
+                />
+              </a>
+              <Package className="h-32 w-32 text-muted-foreground/20 relative z-10 pointer-events-none" />
               
               {/* Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -122,6 +163,33 @@ export default function ProductDetail() {
                 {stockLabel}
               </span>
             </div>
+
+            {galleryImages.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-3">
+                {galleryImages.map((imageUrl, index) => (
+                  <button
+                    key={`${imageUrl}-${index}`}
+                    type="button"
+                    onClick={() => setMainImage(imageUrl)}
+                    className={`h-16 w-16 rounded-lg border transition ${
+                      mainImage === imageUrl
+                        ? "border-accent ring-2 ring-accent/40"
+                        : "border-border hover:border-accent/70"
+                    }`}
+                    aria-label="Cambiar imagen principal"
+                  >
+                    <img
+                      src={imageUrl}
+                      alt={`${product.nombre} vista ${index + 1}`}
+                      className="h-full w-full rounded-lg object-cover"
+                      onError={(event) => {
+                        event.currentTarget.src = placeholderImage;
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
