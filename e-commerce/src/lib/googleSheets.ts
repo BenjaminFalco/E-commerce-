@@ -29,7 +29,7 @@ export interface Product {
 
 const SHEET_ID = "1Znbuniwm_hzwtgMxjRNK5-Rk6k-BJfL2qdKLYacChsE";
 const GID = "151725806";
-const SHEETS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
+const SHEETS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
 
 function parseCSVLine(line: string): string[] {
   const result: string[] = [];
