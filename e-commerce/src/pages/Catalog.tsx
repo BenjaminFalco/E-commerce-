@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductGrid } from "@/components/ProductGrid";
@@ -14,6 +14,7 @@ export default function Catalog() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
@@ -29,6 +30,14 @@ export default function Catalog() {
       return matchesCategory && matchesSearch;
     });
   }, [products, selectedCategory, searchQuery]);
+
+  useEffect(() => {
+  const intervalId = window.setInterval(() => {
+    window.location.reload();
+  }, 60_000);
+
+  return () => window.clearInterval(intervalId);
+}, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
